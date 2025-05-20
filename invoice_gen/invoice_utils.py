@@ -1254,6 +1254,7 @@ def fill_invoice_data(
                 fob_data_keys = { # Mapping from Sheet Header -> Data Source Key
                     'P.O N °': 'combined_po', 'P.O Nº': 'combined_po', 'P.ON°': 'combined_po',
                     'ITEM NO': 'combined_item', 'ITEM Nº': 'combined_item' , 'ITEM N°': 'combined_item', 'Name of Cormodity': 'combined_item',
+                    "Name of\nCormodity": "combined_item",
                     'Quantity ( SF )': 'total_sqft', 'Quantity(SF)': 'total_sqft', "Quantity(SF)": 'total_sqft', "Unit Price(USD)": 'unit_price',
                     'Amount ( USD )': 'total_amount', 'Total value(USD)': 'total_amount', "P.O Nº": "combined_po", "P.O N°": "combined_po",
                     "Quantity\n(SF)": 'total_sqft', "Amount(USD)": 'total_amount'
