@@ -1256,6 +1256,7 @@ def fill_invoice_data(
                     'ITEM NO': 'combined_item', 'ITEM Nº': 'combined_item' , 'ITEM N°': 'combined_item', 'Name of Cormodity': 'combined_item',
                     'Quantity ( SF )': 'total_sqft', 'Quantity(SF)': 'total_sqft', "Quantity(SF)": 'total_sqft', "Unit Price(USD)": 'unit_price',
                     'Amount ( USD )': 'total_amount', 'Total value(USD)': 'total_amount', "P.O Nº": "combined_po", "P.O N°": "combined_po",
+                    "Quantity\n(SF)": 'total_sqft', "Amount(USD)": 'total_amount'
                 }
                 desc_header_options = ["Description", "DESCRIPTION OF GOODS", "Description of Goods", "DESCRIPTION"]
                 desc_col_idx_fob_prep = None
@@ -1404,7 +1405,7 @@ def fill_invoice_data(
             print(f"  data_source_type: {data_source_type}")
             # --- END DEBUG START LOOP ---
             try:
-                headers_to_sum = ["PCS", "SF", "N.W (kgs)", "G.W (kgs)", "CBM", "Quantity ( SF )", "Amount ( USD )", "Quantity(SF)", "Total value(USD)", "Quantity"]
+                headers_to_sum = ["Amount(USD)", "PCS", "SF", "N.W (kgs)", "G.W (kgs)", "CBM","Quantity(SF)", "Quantity\n(SF)", "Amount(USD)", "Quantity ( SF )", "Amount ( USD )", "Quantity(SF)", "Total value(USD)", "Quantity"]
                 # Define general NO. column index needed for standard modes
                 no_col_idx = column_map.get("NO") or column_map.get("NO.") # Moved definition here
                 # Pre-find column indices needed for FOB mode
@@ -1414,9 +1415,9 @@ def fill_invoice_data(
                 fob_no_col_idx = None
                 fob_pallet_info_col_idx = pallet_info_col_idx # Reuse general pallet info index if found
 
-                unit_price_headers = ["Unit price ( USD )", "Unit Price(USD)"]
-                amount_headers = ["Amount ( USD )", "Total value(USD)"]
-                quantity_headers = ["Quantity ( SF )", "Quantity(SF)"]
+                unit_price_headers = ["Unit price ( USD )", "Unit Price(USD)", "Unit Price\n(USD)"]
+                amount_headers = ["Amount ( USD )", "Total value(USD)", "Amount(USD)"]
+                quantity_headers = ["Quantity ( SF )", "Quantity(SF)", "Quantity\n(SF)"]
                 no_headers = ["NO", "NO."]
 
                 for header, col_idx in column_map.items():
@@ -1505,7 +1506,7 @@ def fill_invoice_data(
                                     elif c_idx == fob_unit_price_col_idx and amount_col_letter and quantity_col_letter:
                                         qty_cell_ref = f"{quantity_col_letter}{target_row}"
                                         amt_cell_ref = f"{amount_col_letter}{target_row}"
-                                        value_to_write = f"=IFERROR({amt_cell_ref}/{qty_cell_ref},0)"
+                                        value_to_write = f"={amt_cell_ref}/{qty_cell_ref}"
                                         # print(f"DEBUG: FOB - Set Unit Price formula {c_idx}: {value_to_write}")
                                     elif c_idx == fob_pallet_info_col_idx:
                                         # Use data row index i for pallet numbering within FOB group
@@ -1577,7 +1578,7 @@ def fill_invoice_data(
                                 if custom_flag and data_source_type == 'aggregation':
                                     # Check for Unit Price Column
                                     unit_price_col_idx_formula = None
-                                    unit_price_headers_formula = ["Unit price ( USD )", "Unit Price(USD)", "unit price"]
+                                    unit_price_headers_formula = ["Unit price ( USD )", "Unit Price(USD)", "unit price", "Unit Price\n(USD)"]
                                     for header, col_idx in column_map.items():
                                         if str(header).lower() in [h.lower() for h in unit_price_headers_formula]:
                                             unit_price_col_idx_formula = col_idx
@@ -1586,8 +1587,8 @@ def fill_invoice_data(
                                         # Calculate custom formula for Unit Price
                                         amount_col_idx_formula = None
                                         quantity_col_idx_formula = None
-                                        amount_headers_formula = ["Amount ( USD )", "Total value(USD)", "amount", "amount_sum"]
-                                        quantity_headers_formula = ["Quantity ( SF )", "Quantity(SF)", "Quantity", "sqft", "sqft_sum"]
+                                        amount_headers_formula = ["Amount ( USD )", "Total value(USD)", "amount", "amount_sum", "Amount(USD)"]
+                                        quantity_headers_formula = ["Quantity ( SF )", "Quantity(SF)", "Quantity", "sqft", "sqft_sum", "Quantity\n(SF)"]
                                         for header, col_idx in column_map.items():
                                             header_lower = str(header).lower()
                                             if header_lower in [h.lower() for h in amount_headers_formula]: amount_col_idx_formula = col_idx
@@ -1897,7 +1898,7 @@ def fill_invoice_data(
              unmerge_row(worksheet, footer_row_final, num_columns) # Ensure footer row is clear before writing
              try:
                  palletNo_col_inx = None
-                 headers_to_sum = ["PCS", "SF", "N.W (kgs)", "G.W (kgs)", "CBM", "Quantity ( SF )", "Amount ( USD )", "Quantity(SF)", "Total value(USD)", "Quantity"]
+                 headers_to_sum = ["PCS", "SF", "N.W (kgs)", "G.W (kgs)", "CBM", "Quantity ( SF )", "Amount ( USD )", "Quantity\n(SF)", "Total value(USD)", "Quantity", "Quantity(SF)", "Amount(USD)"]
                  total_text_col_idx = None; item_col_idx = column_map.get("NO") or column_map.get("NO."); total_text_col_idx = item_col_idx
                  if not total_text_col_idx: palletNo_col_inx = column_map.get("PALLET\nNO.") or column_map.get("Pallet\nNo"); total_text_col_idx = palletNo_col_inx
                  if not total_text_col_idx: po_col_idx = column_map.get("P.O Nº") or column_map.get("P.O N°") or column_map.get("CUT.P.O.") ; total_text_col_idx = po_col_idx

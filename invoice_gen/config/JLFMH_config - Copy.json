@@ -65,6 +65,7 @@
           "Mark & N°"
         ],
         "columns_with_full_grid": [
+          "DC",
           "P.O N°",
           "ITEM N°",
           "Description",
@@ -89,7 +90,7 @@
             "alignment": {"horizontal": "center"},
             "number_format": "#,##0.00"
           },
-          "Unit Price\n(USD)": {
+          "Unit price\n(USD)": {
             "alignment": {"horizontal": "center"},
             "number_format": "#,##0.00"
           },
@@ -110,7 +111,7 @@
           "ITEM N°": 21,
           "Description": 20,
           "Quantity\n(SF)": 18,
-          "Unit Price\n(USD)": 18,
+          "Unit price\n(USD)": 18,
           "Amount(USD)": 23
         },
         "header_font": {
@@ -141,7 +142,7 @@
       "add_blank_before_footer": false,
       "static_content_before_footer": {},
       "header_to_write": [
-        ["NO", "ITEM Nº", "Quantity(SF)", "Unit Price\n(USD)", "Total value(USD)"]
+        ["NO", "ITEM Nº", "Quantity(SF)", "Unit Price(USD)", "Total value(USD)"]
       ],
       "mappings": {
         "PO_from_key": {"key_index": 0, "header": "P.O Nº"},
@@ -152,14 +153,14 @@
           "fallback_on_none": "LEATHER"
         },
         "SqFt_from_val": {"value_key": "sqft_sum", "header": "Quantity(SF)"},
-        "Unit_from_key": {"key_index": 2, "header": "Unit Price\n(USD)"},
+        "Unit_from_key": {"key_index": 2, "header": "Unit Price(USD)"},
         "Amount_formula_contract": {
           "header": "Total value(USD)",
           "type": "formula",
           "formula_template": "{col_ref_1}{row} * {col_ref_0}{row}",
           "inputs": [
             "Quantity(SF)",
-            "Unit Price\n(USD)"
+            "Unit Price(USD)"
           ]
         }
       },
@@ -175,12 +176,13 @@
           "NO"
         ],
         "columns_with_full_grid": [
+          "DC",
           "NO",
           "P.O Nº",
           "ITEM Nº",
           "Description",
           "Quantity(SF)",
-          "Unit Price\n(USD)",
+          "Unit Price(USD)",
           "Total value(USD)"
         ],
         "default_font": {
@@ -200,7 +202,7 @@
             "alignment": {"horizontal": "center"},
             "number_format": "#,##0.00"
           },
-          "Unit Price\n(USD)": {
+          "Unit Price(USD)": {
             "alignment": {"horizontal": "center"},
             "number_format": "#,##0.00"
           },
@@ -220,7 +222,7 @@
           "Name of Cormodity": 33,
           "Description": 35,
           "Quantity(SF)": 27,
-          "Unit Price\n(USD)": 28,
+          "Unit Price(USD)": 28,
           "Total value(USD)": 47
         },
         "header_font": {
@@ -289,6 +291,7 @@
           "Mark & N°"
         ],
         "columns_with_full_grid": [
+          "DC",
           "CUT.P.O.",
           "ITEM N°",
           "Description",
