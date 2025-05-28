@@ -918,9 +918,16 @@ def main():
                             "case_sensitive": False # Match regardless of case
                         },
                         {
+                            "find": "BAVET, SVAY RIENG",    # Text to find
+                            "replace": "BAVET",     # Text to replace with
+                            "case_sensitive": True, # Match regardless of case
+                            "exact_cell_match": True
+                        },
+                        {
                             "find": "BINH PHUOC",    # Text to find
                             "replace": "BAVET",     # Text to replace with
-                            "case_sensitive": False # Match regardless of case
+                            "case_sensitive": True, # Match regardless of case
+                            "exact_cell_match": True
                         }
                         # Add more FOB-specific rules here if needed
                     ]
@@ -1297,7 +1304,14 @@ def main():
                                 {
                                     "find": "BINH PHUOC",    # Text to find
                                     "replace": "BAVET",     # Text to replace with
-                                    "case_sensitive": False # Match regardless of case
+                                    "case_sensitive": False, # Match regardless of case
+                                    "exact_cell_match": True
+                                },
+                                {
+                                    "find": "BAVET, SVAY RIENG",    # Text to find
+                                    "replace": "BAVET",     # Text to replace with
+                                    "case_sensitive": True, # Match regardless of case
+                                    "exact_cell_match": True
                                 }
                                 # Add more FOB-specific rules here if needed
                             ]

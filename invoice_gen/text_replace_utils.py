@@ -302,15 +302,18 @@ def find_and_replace_in_workbook(
 ):
     """
     Performs find-and-replace operations on specified sheets within a workbook.
+    Rules are applied sequentially to the content of each cell.
 
     Args:
-        workbook: The openpyxl Workbook object to modify.
+        workbook: The openpyxl-like Workbook object to modify.
         replacement_rules: A list of dictionaries, where each dictionary defines a rule:
             {
                 "find": "text_to_find",
                 "replace": "replacement_text",
-                "case_sensitive": False (Optional, defaults to False)
-                # Add future options like 'whole_word' if needed
+                "case_sensitive": False,  # Optional, defaults to False
+                "exact_cell_match": False # Optional, defaults to False.
+                                          # If True, "find" must match the entire cell content.
+                                          # If False, "find" is treated as a substring.
             }
         target_sheets: Optional list of sheet names to process. If None, processes all visible sheets.
     """
@@ -320,87 +323,103 @@ def find_and_replace_in_workbook(
 
     print(f"--- Starting Global Text Replacement ---")
 
-    sheets_to_process = []
+    sheets_to_process_names: List[str] = []
     if target_sheets:
-        sheets_to_process = [sheet_name for sheet_name in target_sheets if sheet_name in workbook.sheetnames]
-        print(f"Targeting specific sheets for replacement: {sheets_to_process}")
+        sheets_to_process_names = [sheet_name for sheet_name in target_sheets if sheet_name in workbook.sheetnames]
+        if not sheets_to_process_names:
+            print(f"Warning: None of the target sheets {target_sheets} were found in the workbook. Sheets available: {workbook.sheetnames}")
+            return
+        print(f"Targeting specific sheets for replacement: {sheets_to_process_names}")
     else:
-        sheets_to_process = [sheet.title for sheet in workbook.worksheets if sheet.sheet_state == 'visible']
-        print(f"Targeting all visible sheets for replacement: {sheets_to_process}")
+        sheets_to_process_names = [sheet.title for sheet in workbook.worksheets if sheet.sheet_state == 'visible']
+        if not sheets_to_process_names:
+            print("Warning: No visible sheets found in the workbook to process.")
+            return
+        print(f"Targeting all visible sheets for replacement: {sheets_to_process_names}")
 
-    if not sheets_to_process:
-        print("Warning: No valid sheets found to process for replacements.")
-        return
+    total_replacements_made_in_workbook = 0
 
-    total_replacements_made = 0
+    for sheet_name in sheets_to_process_names:
+        try:
+            worksheet = workbook[sheet_name] 
+        except KeyError:
+            print(f"Warning: Sheet '{sheet_name}' not found in workbook during processing. Skipping.")
+            continue
+            
+        print(f"Processing sheet: '{worksheet.title}' for replacements...")
+        sheet_replacements_made_in_sheet = 0
 
-    for sheet_name in sheets_to_process:
-        worksheet = workbook[sheet_name]
-        print(f"Processing sheet: '{sheet_name}' for replacements...")
-        sheet_replacements_made = 0
-
-        # Iterate through all cells in the sheet
-        # Using iter_rows() is generally efficient
-        for row_idx, row in enumerate(worksheet.iter_rows(), start=1):
-            for col_idx, cell in enumerate(row, start=1):
-                # Skip merged cells (only process the top-left origin cell implicitly)
-                if isinstance(cell, MergedCell):
+        # worksheet.iter_rows() needs to be robust enough for the dummy classes
+        # It should iterate based on the actual data extent (max_row, max_column)
+        for row_idx, row_cells_tuple in enumerate(worksheet.iter_rows(), start=1):
+            for col_idx, cell in enumerate(row_cells_tuple, start=1):
+                if isinstance(cell, MergedCell): 
                     continue
 
-                original_value = cell.value
+                original_cell_content = cell.value
 
-                # Only process cells containing strings
-                if isinstance(original_value, str):
-                    current_value = original_value
-                    cell_modified = False
-                    for rule in replacement_rules:
-                        text_to_find = rule.get("find")
-                        replacement_text = rule.get("replace", "") # Default to empty string if missing
-                        case_sensitive = rule.get("case_sensitive", False)
+                if isinstance(original_cell_content, str):
+                    current_value_in_cell = original_cell_content 
+                    cell_content_was_modified_by_any_rule = False
+                    
+                    for rule_idx, rule_details in enumerate(replacement_rules):
+                        text_to_find_in_rule = rule_details.get("find")
+                        replacement_text_from_rule = rule_details.get("replace", "") 
+                        is_case_sensitive_rule = rule_details.get("case_sensitive", False)
+                        is_exact_cell_match_rule = rule_details.get("exact_cell_match", False)
 
-                        if text_to_find is None: # Skip rule if 'find' is missing
+                        if text_to_find_in_rule is None: 
                             continue
 
-                        # Ensure find/replace values are strings
-                        text_to_find = str(text_to_find)
-                        replacement_text = str(replacement_text)
+                        text_to_find_str_rule = str(text_to_find_in_rule)
+                        replacement_text_str_rule = str(replacement_text_from_rule)
+                        
+                        value_before_this_rule_applied_to_cell = current_value_in_cell 
 
-                        # Perform replacement
-                        if case_sensitive:
-                            if text_to_find in current_value:
-                                current_value = current_value.replace(text_to_find, replacement_text)
-                                cell_modified = True
-                        else:
-                            # Simple case-insensitive replace (more complex regex could be used for edge cases)
-                            if text_to_find.lower() in current_value.lower():
-                                # Rebuild string to handle case-insensitivity (simple approach)
-                                # This might not be perfect for overlapping matches but covers many cases
-                                new_value_parts = []
-                                start_index = 0
-                                find_len = len(text_to_find)
-                                while start_index < len(current_value):
-                                    found_index = current_value.lower().find(text_to_find.lower(), start_index)
-                                    if found_index == -1:
-                                        new_value_parts.append(current_value[start_index:])
-                                        break
-                                    else:
-                                        new_value_parts.append(current_value[start_index:found_index])
-                                        new_value_parts.append(replacement_text)
-                                        start_index = found_index + find_len
-                                current_value = "".join(new_value_parts)
-                                cell_modified = True
-
-                    # If any rule modified the cell, write the final value back
-                    if cell_modified:
+                        if is_exact_cell_match_rule: 
+                            if is_case_sensitive_rule:
+                                if current_value_in_cell == text_to_find_str_rule:
+                                    current_value_in_cell = replacement_text_str_rule
+                            else: 
+                                if current_value_in_cell.lower() == text_to_find_str_rule.lower():
+                                    current_value_in_cell = replacement_text_str_rule
+                        else: 
+                            if is_case_sensitive_rule:
+                                if text_to_find_str_rule in current_value_in_cell:
+                                    current_value_in_cell = current_value_in_cell.replace(text_to_find_str_rule, replacement_text_str_rule)
+                            else: 
+                                if text_to_find_str_rule.lower() in current_value_in_cell.lower():
+                                    new_value_parts = []
+                                    start_search_index = 0
+                                    find_text_len = len(text_to_find_str_rule)
+                                    
+                                    original_text_for_this_find_operation = current_value_in_cell
+                                    original_text_lower_for_this_find = original_text_for_this_find_operation.lower()
+                                    text_to_find_lower_rule = text_to_find_str_rule.lower()
+                                    
+                                    while start_search_index < len(original_text_for_this_find_operation):
+                                        found_at_index = original_text_lower_for_this_find.find(text_to_find_lower_rule, start_search_index)
+                                        if found_at_index == -1: 
+                                            new_value_parts.append(original_text_for_this_find_operation[start_search_index:])
+                                            break
+                                        else:
+                                            new_value_parts.append(original_text_for_this_find_operation[start_search_index:found_at_index])
+                                            new_value_parts.append(replacement_text_str_rule)
+                                            start_search_index = found_at_index + find_text_len
+                                    current_value_in_cell = "".join(new_value_parts)
+                        
+                        if current_value_in_cell != value_before_this_rule_applied_to_cell:
+                            cell_content_was_modified_by_any_rule = True
+                            
+                    if cell_content_was_modified_by_any_rule:
                         try:
-                            cell.value = current_value
-                            sheet_replacements_made += 1
-                            # print(f"DEBUG: Replaced in {sheet_name}!{cell.coordinate}: '{original_value}' -> '{current_value}'")
+                            cell.value = current_value_in_cell 
+                            sheet_replacements_made_in_sheet += 1
                         except Exception as write_err:
-                             print(f"Warning: Error writing replaced value to {sheet_name}!{cell.coordinate}: {write_err}")
+                            print(f"Warning: Error writing replaced value to {worksheet.title}!{cell.coordinate}: {write_err}")
 
-        if sheet_replacements_made > 0:
-            print(f"Made {sheet_replacements_made} replacement(s) in sheet '{sheet_name}'.")
-        total_replacements_made += sheet_replacements_made
+        if sheet_replacements_made_in_sheet > 0:
+            print(f"Made {sheet_replacements_made_in_sheet} replacement(s) in sheet '{worksheet.title}'.")
+        total_replacements_made_in_workbook += sheet_replacements_made_in_sheet
 
-    print(f"--- Finished Global Text Replacement. Total replacements made: {total_replacements_made} ---")
+    print(f"--- Finished Global Text Replacement. Total replacements made in workbook: {total_replacements_made_in_workbook} ---")

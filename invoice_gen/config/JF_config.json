@@ -52,7 +52,7 @@
         "Initial_Col1_Static": {
           "type": "initial_static_rows",
           "column_header": "Mark & N°",
-          "values": ["VENDOR#:", "Des: LEATHER", "Case Qty:", "MADE IN CAMBODIA"]
+          "values": ["VENDOR#:", "Des: LEATHER", "MADE IN CAMBODIA"]
         }
       },
       "merge_rules_after_header": {},
@@ -259,7 +259,7 @@
         "Initial_Col1_Static_PL": {
           "type": "initial_static_rows",
           "column_header": "Mark & Nº",
-          "values": ["VENDOR#:", "Des: LEATHER", "MADE IN CAMBODIA"]
+          "values": ["VENDOR#:", "Des: LEATHER", "Case Qty:", "MADE IN CAMBODIA"]
         },
         "po": "P.O N°",
         "item": "ITEM N°",
