@@ -141,8 +141,12 @@
       "add_blank_before_footer": false,
       "static_content_before_footer": {},
       "header_to_write": [
-        ["Description Of Goods", null, null, null, null, null, "Unit Price", "Quantity(SF)", "Amount", null]
+        ["Description Of Goods", null, null, null, null, null, "Unit Price", "Quantity(SF)", "Amount(USD)", null]
       ],
+      "data_cell_merging_rule": {
+        "Description Of Goods": {"rowspan": 6},
+        "Amount(USD)": {"rowspan": 2}
+      },
       "mappings": {
         "PO_from_key": {"key_index": 0, "header": "P.O Nº"},
         "Item_from_key": {"key_index": 1, "header": "Description Of Goods"},
@@ -154,7 +158,7 @@
         "SqFt_from_val": {"value_key": "sqft_sum", "header": "Quantity(SF)"},
         "Unit_from_key": {"key_index": 2, "header": "Unit Price"},
         "Amount_formula_contract": {
-          "header": "Amount",
+          "header": "Amount(USD)",
           "type": "formula",
           "formula_template": "{col_ref_1}{row} * {col_ref_0}{row}",
           "inputs": [
@@ -163,12 +167,23 @@
           ]
         }
       },
+      "header_merge_rules": {
+        "Description Of Goods": {"colspan": 6},
+        "Unit Price": {"colspan": 1},
+        "Quantity(SF)": {"colspan": 1},
+        "Amount(USD)": {"colspan": 2}
+      },
       "merge_rules_after_header": {},
       "merge_rules_before_footer": {},
       "merge_rules_footer": {
-        "1": 2
+        "2": 5,
+        "9": 2
       },
       "styling": {
+        "header_pattern_fill": {
+          "fill_type": "solid",
+          "start_color": "D3D3D3"
+        },
         "force_text_format_headers": [
           "Description Of Goods",
           "Quantity(SF)",
@@ -178,7 +193,7 @@
           "Description Of Goods",
           "Quantity(SF)",
           "Unit Price",
-          "Amount"
+          "Amount(USD)"
         ],
         "default_font": {
           "name": "Times New Roman",
@@ -192,7 +207,7 @@
           "wrap_text": true
         },
         "column_styles": {
-          "Amount": {
+          "Amount(USD)": {
             "font": {"bold": false},
             "alignment": {"horizontal": "center"},
             "number_format": "#,##0.00"

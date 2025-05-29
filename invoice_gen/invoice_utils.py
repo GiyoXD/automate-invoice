@@ -911,57 +911,76 @@ def write_configured_rows(
 def apply_explicit_data_cell_merges(
     worksheet: Worksheet,
     row_num: int,
-    column_map: Dict[str, int], # Maps header text to its 1-based column index
+    column_map: Dict[str, int],  # Maps header text to its 1-based column index
     num_total_columns: int,
-    merge_rules_data_cells: Dict[str, int], # {header_text: colspan}
-    sheet_styling_config: Optional[Dict[str, Any]]
+    # merge_rules_data_cells: e.g., {'Header': {'rowspan': 3, ...}}
+    merge_rules_data_cells: Dict[str, Dict[str, Any]], 
+    sheet_styling_config: Optional[Dict[str, Any]] # e.g. {'Header': {'font': {'bold':True}}}
 ):
     """
     Applies horizontal merges to data cells in a specific row
-    based on explicit rules (header_text: colspan).
+    based on explicit rules. The merged cell will have a thin black border
+    around its entire perimeter and its content will be centered.
     """
-    if not merge_rules_data_cells or row_num <= 0: #
+    if not merge_rules_data_cells or row_num <= 0:
         return
 
-    for header_text, colspan in merge_rules_data_cells.items(): #
-        if not isinstance(colspan['rowspan'], int) or colspan['rowspan'] <= 1: # Only merge if colspan > 1
-            continue
+    thin_side = Side(border_style="thin", color="000000")
+    full_thin_border = Border(
+        left=thin_side,
+        right=thin_side,
+        top=thin_side,
+        bottom=thin_side
+    )
+    center_alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
 
-        start_col_idx = column_map.get(header_text) #
+    for header_text, rule_details in merge_rules_data_cells.items():
+        colspan_to_apply = rule_details.get("rowspan") 
+
+        if not isinstance(colspan_to_apply, int) or colspan_to_apply <= 1:
+            continue
+        start_col_idx = column_map.get(header_text)
         if not start_col_idx:
-            # print(f"Warning: Header '{header_text}' for data cell merge rule not found in column_map on row {row_num}.")
             continue
+        end_col_idx = start_col_idx + colspan_to_apply - 1
+        end_col_idx = min(end_col_idx, num_total_columns)
 
-        end_col_idx = start_col_idx + colspan['rowspan'] - 1 #
-        end_col_idx = min(end_col_idx, num_total_columns) # Clamp to table width
-
-        if start_col_idx >= end_col_idx: # No actual merge to perform
+        if start_col_idx >= end_col_idx:
             continue
 
         try:
-            # Unmerge any existing conflicting merges in the target data row range
-            # This is crucial to prevent errors when applying the new merge.
-            for mc_range in list(worksheet.merged_cells.ranges): #
-                if mc_range.min_row == row_num and mc_range.max_row == row_num: #
-                    if mc_range.min_col <= end_col_idx and mc_range.max_col >= start_col_idx: #
+            current_merged_cell_ranges = list(worksheet.merged_cells.ranges)
+            for mc_range in current_merged_cell_ranges:
+                if mc_range.min_row == row_num and mc_range.max_row == row_num:
+                    if mc_range.min_col <= end_col_idx and mc_range.max_col >= start_col_idx:
                         try:
-                            worksheet.unmerge_cells(str(mc_range)) #
-                        except Exception: # nosemgrep: general-exception-caught # To catch potential minor errors during unmerge
-                            # print(f"Minor issue: Could not unmerge range {str(mc_range)} on data row {row_num}: {e}")
-                            pass 
+                            worksheet.unmerge_cells(str(mc_range))
+                        except Exception:
+                            pass
             
-            # Apply the new merge to the data row
             worksheet.merge_cells(start_row=row_num, start_column=start_col_idx,
-                                  end_row=row_num, end_column=end_col_idx) #
+                                  end_row=row_num, end_column=end_col_idx)
             
-            # Re-apply style to the anchor cell (top-left cell of the merged range)
-            anchor_cell = worksheet.cell(row=row_num, column=start_col_idx) #
-            _apply_cell_style(anchor_cell, header_text, sheet_styling_config) #
+            anchor_cell: Cell = worksheet.cell(row=row_num, column=start_col_idx)
+            
+            # === DEBUGGING STEP FOR BORDERS ===
+            # If borders are not appearing AT ALL, try commenting out the following
+            # call to _apply_cell_style to isolate the issue. If borders appear
+            # when this is commented out, then _apply_cell_style is likely resetting
+            # or interfering with the border style.
+            if sheet_styling_config: 
+                 specific_rules_for_cell = sheet_styling_config.get(header_text)
+                 # _apply_cell_style(anchor_cell, header_text, specific_rules_for_cell) # <-- TRY COMMENTING THIS LINE
+            # === END DEBUGGING STEP ===
+
+            anchor_cell.border = full_thin_border
+            anchor_cell.alignment = center_alignment
 
         except Exception as e:
-            print(f"Error applying explicit data cell merge for '{header_text}' on row {row_num} (col {start_col_idx}, span {colspan}): {e}")
-            # import traceback # If needed for more detailed debugging
-            # traceback.print_exc()
+            print(f"Error applying explicit data cell merge, border, or alignment for '{header_text}' on row {row_num} (col {start_col_idx}, span {colspan_to_apply}): {e}")
+
+
+
 
 def fill_invoice_data(
     worksheet: Worksheet,
@@ -1780,15 +1799,6 @@ def fill_invoice_data(
                                 # _apply_cell_style(cell, current_header, sheet_styling_config) # Optional styling for blank static cells
                             # --- Else (row is neither data nor static label - should not happen if actual_rows_to_process is correct) --- #
                             # Optionally handle this case if needed, but likely implies row count mismatch
-                    if data_cell_merging_rules: # Check if there are any rules for this sheet
-                        apply_explicit_data_cell_merges(
-                                worksheet=worksheet,
-                                row_num=target_row,
-                                column_map=column_map,
-                                num_total_columns=num_columns,
-                                merge_rules_data_cells=data_cell_merging_rules, # Your variable name
-                                sheet_styling_config=sheet_styling_config
-                            )
 
                     # --- Apply Border (Common to both modes, done once per row) ---
                     for c_idx_border in range(1, num_columns + 1):
@@ -1813,6 +1823,15 @@ def fill_invoice_data(
                             print(f"Warning: Error applying border to {target_row},{c_idx_border}: {border_err}")
                             pass # Continue processing other cells/rows
 
+                    if data_cell_merging_rules: # Check if there are any rules for this sheet
+                        apply_explicit_data_cell_merges(
+                                worksheet=worksheet,
+                                row_num=target_row,
+                                column_map=column_map,
+                                num_total_columns=num_columns,
+                                merge_rules_data_cells=data_cell_merging_rules, # Your variable name
+                                sheet_styling_config=sheet_styling_config
+                            )
             except Exception as fill_data_err:
                 print(f"Error during data filling loop: {fill_data_err}\n{traceback.format_exc()}")
                 return False, footer_row_final + 1, data_start_row, data_end_row, 0
