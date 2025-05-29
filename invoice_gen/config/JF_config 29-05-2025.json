@@ -55,9 +55,6 @@
           "values": ["VENDOR#:", "Des: LEATHER", "MADE IN CAMBODIA"]
         }
       },
-      "data_cell_merging_rule": {
-        "ITEM N°": {"rowspan": 2}
-      },
       "merge_rules_after_header": {},
       "merge_rules_before_footer": {"2": 2},
       "merge_rules_footer": {},
@@ -144,11 +141,11 @@
       "add_blank_before_footer": false,
       "static_content_before_footer": {},
       "header_to_write": [
-        ["NO", "ITEM N°", "Quantity(SF)", "Unit Price(USD)", "Total value(USD)"]
+        ["NO", "ITEM Nº", "Quantity(SF)", "Unit Price(USD)", "Total value(USD)"]
       ],
       "mappings": {
         "PO_from_key": {"key_index": 0, "header": "P.O Nº"},
-        "Item_from_key": {"key_index": 1, "header": "ITEM N°"},
+        "Item_from_key": {"key_index": 1, "header": "ITEM Nº"},
         "Desc_From_Key_Tuple": {
           "key_index": 3,
           "header": "Description",
@@ -166,10 +163,6 @@
           ]
         }
       },
-
-      "data_cell_merging_rule": {
-        "ITEM N°": {"rowspan": 2}
-      },
       "merge_rules_after_header": {},
       "merge_rules_before_footer": {},
       "merge_rules_footer": {
@@ -178,13 +171,13 @@
       "styling": {
         "force_text_format_headers": [
           "P.O Nº",
-          "ITEM N°",
+          "ITEM Nº",
           "NO"
         ],
         "columns_with_full_grid": [
           "NO",
           "P.O Nº",
-          "ITEM N°",
+          "ITEM Nº",
           "Description",
           "Quantity(SF)",
           "Unit Price(USD)",
@@ -261,9 +254,6 @@
       ],
       "header_merge_rules": {
         "Quantity": {"colspan": 2}
-      },
-      "data_cell_merging_rule": {
-        "ITEM N°": {"rowspan": 2}
       },
       "mappings": {
         "Initial_Col1_Static_PL": {

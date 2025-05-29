@@ -408,6 +408,7 @@ def main():
             merge_rules_after_hdr = sheet_mapping_section.get("merge_rules_after_header", {})
             merge_rules_before_ftr = sheet_mapping_section.get("merge_rules_before_footer", {})
             merge_rules_footer = sheet_mapping_section.get("merge_rules_footer", {})
+            data_cell_merging_rules = sheet_mapping_section.get("data_cell_merging_rule", None)
 
             print(f"DEBUG Check Flags Read for Sheet '{sheet_name}': after_hdr={add_blank_after_hdr_flag}, before_ftr={add_blank_before_ftr_flag}")
             if sheet_styling_config: print("DEBUG: Styling config found for this sheet.")
@@ -552,7 +553,8 @@ def main():
                         merge_rules_footer=merge_rules_footer,
                         footer_info=None, max_rows_to_fill=None,
                         grand_total_pallets=final_grand_total_pallets,
-                        custom_flag=args.custom
+                        custom_flag=args.custom,
+                        data_cell_merging_rules=data_cell_merging_rules,
                     )
                     # fill_invoice_data now handles writing blank rows, data, footer row
                     # within the allocated space. next_row_after_chunk is the row AFTER its footer.
@@ -1080,7 +1082,8 @@ def main():
                         merge_rules_footer=merge_rules_footer,
                         footer_info=footer_info, max_rows_to_fill=None,
                         grand_total_pallets=final_grand_total_pallets,
-                        custom_flag=args.custom
+                        custom_flag=args.custom,
+                        data_cell_merging_rules=data_cell_merging_rules
                     )
                     # ***** END MODIFIED CALL *****
                     

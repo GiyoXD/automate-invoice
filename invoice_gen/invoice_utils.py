@@ -851,6 +851,60 @@ def write_configured_rows(
 
     print(f"--- Finished writing configured rows ---")
 
+def apply_explicit_data_cell_merges(
+    worksheet: Worksheet,
+    row_num: int,
+    column_map: Dict[str, int], # Maps header text to its 1-based column index
+    num_total_columns: int,
+    merge_rules_data_cells: Dict[str, int], # {header_text: colspan}
+    sheet_styling_config: Optional[Dict[str, Any]]
+):
+    """
+    Applies horizontal merges to data cells in a specific row
+    based on explicit rules (header_text: colspan).
+    """
+    if not merge_rules_data_cells or row_num <= 0: #
+        return
+
+    for header_text, colspan in merge_rules_data_cells.items(): #
+        if not isinstance(colspan['rowspan'], int) or colspan['rowspan'] <= 1: # Only merge if colspan > 1
+            continue
+
+        start_col_idx = column_map.get(header_text) #
+        if not start_col_idx:
+            # print(f"Warning: Header '{header_text}' for data cell merge rule not found in column_map on row {row_num}.")
+            continue
+
+        end_col_idx = start_col_idx + colspan['rowspan'] - 1 #
+        end_col_idx = min(end_col_idx, num_total_columns) # Clamp to table width
+
+        if start_col_idx >= end_col_idx: # No actual merge to perform
+            continue
+
+        try:
+            # Unmerge any existing conflicting merges in the target data row range
+            # This is crucial to prevent errors when applying the new merge.
+            for mc_range in list(worksheet.merged_cells.ranges): #
+                if mc_range.min_row == row_num and mc_range.max_row == row_num: #
+                    if mc_range.min_col <= end_col_idx and mc_range.max_col >= start_col_idx: #
+                        try:
+                            worksheet.unmerge_cells(str(mc_range)) #
+                        except Exception: # nosemgrep: general-exception-caught # To catch potential minor errors during unmerge
+                            # print(f"Minor issue: Could not unmerge range {str(mc_range)} on data row {row_num}: {e}")
+                            pass 
+            
+            # Apply the new merge to the data row
+            worksheet.merge_cells(start_row=row_num, start_column=start_col_idx,
+                                  end_row=row_num, end_column=end_col_idx) #
+            
+            # Re-apply style to the anchor cell (top-left cell of the merged range)
+            anchor_cell = worksheet.cell(row=row_num, column=start_col_idx) #
+            _apply_cell_style(anchor_cell, header_text, sheet_styling_config) #
+
+        except Exception as e:
+            print(f"Error applying explicit data cell merge for '{header_text}' on row {row_num} (col {start_col_idx}, span {colspan}): {e}")
+            # import traceback # If needed for more detailed debugging
+            # traceback.print_exc()
 
 def fill_invoice_data(
     worksheet: Worksheet,
@@ -872,7 +926,8 @@ def fill_invoice_data(
     footer_info: Optional[Dict[str, Any]] = None, # Currently unused
     max_rows_to_fill: Optional[int] = None,
     grand_total_pallets: int = 0, # RE-ADDED parameter
-    custom_flag: bool = False # Added custom flag parameter
+    custom_flag: bool = False, # Added custom flag parameter
+    data_cell_merging_rules: Optional[Dict[str, Any]] = None # Added data cell merging rules 29/05/2025
     ) -> Tuple[bool, int, int, int, int]: # Still 5 return values
     """
     REVISED LOGIC V13: Added merge_rules_footer parameter.
@@ -911,6 +966,7 @@ def fill_invoice_data(
     mapping_rules = mapping_rules or {}
 
     try:
+        data_cell_merging_rules = data_cell_merging_rules or {}
         # --- Validate Header Info --- (Keep existing)
         if not header_info or 'second_row_index' not in header_info or 'column_map' not in header_info or 'num_columns' not in header_info:
             print("Error: Invalid header_info provided.")
@@ -1550,6 +1606,7 @@ def fill_invoice_data(
                         row_data_dict = data_rows_prepared[i] if i < len(data_rows_prepared) else {}
                         is_data_row = (i < len(data_rows_prepared))
                         is_static_label_row = (i < num_static_labels)
+                    # merging rule for data cells
 
                         for c_idx in range(1, num_columns + 1):
                             cell = worksheet.cell(row=target_row, column=c_idx)
@@ -1666,6 +1723,15 @@ def fill_invoice_data(
                                 # _apply_cell_style(cell, current_header, sheet_styling_config) # Optional styling for blank static cells
                             # --- Else (row is neither data nor static label - should not happen if actual_rows_to_process is correct) --- #
                             # Optionally handle this case if needed, but likely implies row count mismatch
+                    if data_cell_merging_rules: # Check if there are any rules for this sheet
+                        apply_explicit_data_cell_merges(
+                                worksheet=worksheet,
+                                row_num=target_row,
+                                column_map=column_map,
+                                num_total_columns=num_columns,
+                                merge_rules_data_cells=data_cell_merging_rules, # Your variable name
+                                sheet_styling_config=sheet_styling_config
+                            )
 
                     # --- Apply Border (Common to both modes, done once per row) ---
                     for c_idx_border in range(1, num_columns + 1):
