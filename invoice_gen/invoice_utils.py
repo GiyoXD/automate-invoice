@@ -1389,7 +1389,7 @@ def fill_invoice_data(
                     "Name of\nCormodity": "combined_item",
                     'Quantity ( SF )': 'total_sqft', 'Quantity(SF)': 'total_sqft', "Quantity(SF)": 'total_sqft', "Unit Price(USD)": 'unit_price',
                     'Amount ( USD )': 'total_amount', 'Total value(USD)': 'total_amount', "P.O Nº": "combined_po", "P.O N°": "combined_po",
-                    "Quantity\n(SF)": 'total_sqft', "Amount(USD)": 'total_amount'
+                    "Quantity\n(SF)": 'total_sqft', "Amount(USD)": 'total_amount', "Description Of Goods": "combined_item",
                 }
                 desc_header_options = ["Description", "DESCRIPTION OF GOODS", "Description of Goods", "DESCRIPTION"]
                 desc_col_idx_fob_prep = None
@@ -1548,7 +1548,7 @@ def fill_invoice_data(
                 fob_no_col_idx = None
                 fob_pallet_info_col_idx = pallet_info_col_idx # Reuse general pallet info index if found
 
-                unit_price_headers = ["Unit price ( USD )", "Unit Price(USD)", "Unit Price\n(USD)"]
+                unit_price_headers = ["Unit price ( USD )", "Unit Price(USD)", "Unit Price\n(USD)", "Unit Price"]
                 amount_headers = ["Amount ( USD )", "Total value(USD)", "Amount(USD)"]
                 quantity_headers = ["Quantity ( SF )", "Quantity(SF)", "Quantity\n(SF)"]
                 no_headers = ["NO", "NO."]

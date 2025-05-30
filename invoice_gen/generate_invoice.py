@@ -1059,7 +1059,7 @@ def main():
                         'Quantity ( SF )': 'total_sqft', 'Quantity(SF)': 'total_sqft',
                         'Amount ( USD )': 'total_amount', 'Total value(USD)': 'total_amount',
                         'Description': 'combined_description', 'DESCRIPTION OF GOODS': 'combined_description',
-                        'Description of Goods': 'combined_description'
+                        'Description of Goods': 'combined_description', "Description Of Goods": 'combined_item'
                     }
 
                     # ***** MODIFIED CALL for single table (Removed starting_pallet_order, adjusted return) *****
