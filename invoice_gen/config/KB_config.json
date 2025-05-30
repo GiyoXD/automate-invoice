@@ -52,7 +52,7 @@
         "Initial_Col1_Static": {
           "type": "initial_static_rows",
           "column_header": "Mark & N°",
-          "values": ["VENDOR#:", "Des: COW LEATHER", "MADE IN CAMBODIA"]
+          "values": ["VENDOR#:", "Des: COW LEATHER", "Case Qty", "MADE IN CAMBODIA"]
         }
       },
       "merge_rules_after_header": {},
@@ -225,14 +225,14 @@
           }
         },
         "column_widths": {
-          "Description Of Goods": 33,
-          "Quantity(SF)": 27,
-          "Unit Price": 28,
-          "Amount": 47
+          "Description Of Goods": 10,
+          "Quantity(SF)": 25,
+          "Unit Price": 24,
+          "Amount": 20
         },
         "header_font": {
-          "name": "Times New Roman",
-          "size": 16,
+          "name": "微软雅黑",
+          "size": 8,
           "bold": true
         },
         "header_alignment": {
@@ -241,8 +241,8 @@
           "wrap_text": true
         },
         "row_heights": {
-          "header": 36,
-          "data_default": 30
+          "header": 13.5,
+          "data_default": 22.5
         }
       }
     },
@@ -266,7 +266,7 @@
         "Initial_Col1_Static_PL": {
           "type": "initial_static_rows",
           "column_header": "Mark & Nº",
-          "values": ["VENDOR#:", "Des: LEATHER", "MADE IN CAMBODIA"]
+          "values": ["VENDOR#:", "Des: LEATHER","Case Qty", "MADE IN CAMBODIA"]
         },
         "po": "P.O N°",
         "item": "ITEM N°",

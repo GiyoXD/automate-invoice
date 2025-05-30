@@ -2046,6 +2046,7 @@ def fill_invoice_data(
                  if not total_text_col_idx: palletNo_col_inx = column_map.get("PALLET\nNO.") or column_map.get("Pallet\nNo"); total_text_col_idx = palletNo_col_inx
                  if not total_text_col_idx: po_col_idx = column_map.get("P.O Nº") or column_map.get("P.O N°") or column_map.get("CUT.P.O.") ; total_text_col_idx = po_col_idx
                  if not total_text_col_idx: mark_col_idx = column_map.get("Mark & Nº") or column_map.get("Mark & N °"); total_text_col_idx = mark_col_idx
+                 if not total_text_col_idx: desc_col_idx = column_map.get("placeholder") or column_map.get("Description\nOf Goods") or column_map.get("Description of Goods"); total_text_col_idx = desc_col_idx
                  if not total_text_col_idx: total_text_col_idx = desc_col_idx if desc_col_idx else 1
                  if total_text_col_idx:
                      try: total_cell = worksheet.cell(row=footer_row_final, column=total_text_col_idx, value= total_value_config or "TOTAL OF: "); total_cell.font = effective_header_font; total_cell.alignment = effective_header_align # Removed _apply_cell_style call
