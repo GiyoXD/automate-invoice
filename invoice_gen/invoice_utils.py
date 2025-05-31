@@ -1331,7 +1331,7 @@ def fill_invoice_data(
                          print(f"DEBUG: Custom flag True. Overriding Amount for aggregation row {row_counter}.")
                          # Find Amount column index
                          amount_col_idx_override = None
-                         amount_headers_override = ["Amount ( USD )", "Total value(USD)", "amount", "amount_sum"]
+                         amount_headers_override = ["Amount ( USD )", "Total value(USD)", "amount", "amount_sum", "Amount(USD)"]
                          for header, col_idx in column_map.items():
                              if str(header).lower() in [h.lower() for h in amount_headers_override]:
                                  amount_col_idx_override = col_idx

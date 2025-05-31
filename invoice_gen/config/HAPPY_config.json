@@ -32,7 +32,7 @@
             {
               "col": 3,
               "value_key": "grand_total_nett_weight",
-              "suffix": "",
+              "suffix": " KGS",
               "number_format": "#,##0.00"
             }
           ]
@@ -52,14 +52,14 @@
             {
               "col": 3,
               "value_key": "grand_total_gross_weight",
-              "suffix": "",
+              "suffix": " KGS",
               "number_format": "#,##0.00"
             }
           ]
         }
       ],
       "footer_pallet_count_column_header": "ITEM N°",
-      "start_row": 20,
+      "start_row": 19,
       "row_spacing": 1,
       "add_blank_after_header": false,
       "static_content_after_header": {
@@ -76,9 +76,9 @@
           "P.O N°",
           "ITEM N°",
           "Description",
-          "Quantity ( SF )",
-          "Unit price ( USD )",
-          "Amount ( USD )"
+          "Quantity\n(SF)",
+          "Unit Price\n(USD)",
+          "Amount(USD)"
         ]
       ],
       "mappings": {
@@ -97,19 +97,19 @@
         },
         "SqFt_from_val": {
           "value_key": "sqft_sum",
-          "header": "Quantity ( SF )"
+          "header": "Quantity\n(SF)"
         },
         "Unit_from_key": {
           "key_index": 2,
-          "header": "Unit price ( USD )"
+          "header": "Unit Price\n(USD)"
         },
         "Amount_formula": {
-          "header": "Amount ( USD )",
+          "header": "Amount(USD)",
           "type": "formula",
           "formula_template": "{col_ref_1}{row} * {col_ref_0}{row}",
           "inputs": [
-            "Quantity ( SF )",
-            "Unit price ( USD )"
+            "Quantity\n(SF)",
+            "Unit Price\n(USD)"
           ]
         },
         "Initial_Col1_Static": {
@@ -117,7 +117,7 @@
           "column_header": "Mark & N°",
           "values": [
             "VENDOR#:",
-            "Des: LEATHER",
+            "Des: COW LEATHER",
             "Case Qty:",
             "MADE IN CAMBODIA"
           ]
@@ -138,9 +138,9 @@
           "P.O N°",
           "ITEM N°",
           "Description",
-          "Quantity ( SF )",
-          "Unit price ( USD )",
-          "Amount ( USD )"
+          "Quantity\n(SF)",
+          "Unit Price\n(USD)",
+          "Amount(USD)"
         ],
         "default_font": {
           "name": "Times New Roman",
@@ -154,7 +154,7 @@
           "wrap_text": true
         },
         "column_styles": {
-          "Amount ( USD )": {
+          "Amount(USD)": {
             "font": {
               "bold": false
             },
@@ -163,13 +163,13 @@
             },
             "number_format": "#,##0.00"
           },
-          "Unit price ( USD )": {
+          "Unit Price\n(USD)": {
             "alignment": {
               "horizontal": "center"
             },
             "number_format": "#,##0.000000"
           },
-          "Quantity ( SF )": {
+          "Quantity\n(SF)": {
             "alignment": {
               "horizontal": "center"
             },
@@ -188,13 +188,13 @@
           }
         },
         "column_widths": {
-          "Mark & N°": 20,
-          "P.O N°": 14,
-          "ITEM N°": 14,
-          "Description": 16,
-          "Quantity ( SF )": 18,
-          "Unit price ( USD )": 18,
-          "Amount ( USD )": 23
+          "Mark & N°": 26,
+          "P.O N°": 27,
+          "ITEM N°": 33,
+          "Description": 20,
+          "Quantity\n(SF)": 18,
+          "Unit Price\n(USD)": 18,
+          "Amount(USD)": 23
         },
         "header_font": {
           "name": "Times New Roman",
@@ -225,25 +225,25 @@
       "add_blank_before_footer": false,
       "static_content_before_footer": {},
       "header_to_write": [
-        ["P.O Nº", "Name of Cormodity\nTên và miêu", "Description\ntả hàng hóa", "Quantity(SF)", "Unit Price(USD)", "Total value(USD)"]
+        ["P.O N°", "Name of Cormodity\nTên và miêu", "Description\ntả hàng hóa", "Quantity\nSố lượng(SF)", "Unit Price\nĐơn giá(USD)", "Total value\nTrị giá(USD)"]
       ],
       "mappings": {
-        "PO_from_key": {"key_index": 0, "header": "P.O Nº"},
+        "PO_from_key": {"key_index": 0, "header": "P.O N°"},
         "Item_from_key": {"key_index": 1, "header": "Name of Cormodity\nTên và miêu"},
         "Desc_From_Key_Tuple": {
           "key_index": 3,
           "header": "Description\ntả hàng hóa",
           "fallback_on_none": "COW LEATHER\nDA BÒ THUỘC"
         },
-        "SqFt_from_val": {"value_key": "sqft_sum", "header": "Quantity(SF)"},
-        "Unit_from_key": {"key_index": 2, "header": "Unit Price(USD)"},
+        "SqFt_from_val": {"value_key": "sqft_sum", "header": "Quantity\nSố lượng(SF)"},
+        "Unit_from_key": {"key_index": 2, "header": "Unit Price\nĐơn giá(USD)"},
         "Amount_formula_contract": {
-          "header": "Total value(USD)",
+          "header": "Total value\nTrị giá(USD)",
           "type": "formula",
           "formula_template": "{col_ref_1}{row} * {col_ref_0}{row}",
           "inputs": [
-            "Quantity(SF)",
-            "Unit Price(USD)"
+            "Quantity\nSố lượng(SF)",
+            "Unit Price\nĐơn giá(USD)"
           ]
         }
       },
@@ -254,18 +254,18 @@
       },
       "styling": {
         "force_text_format_headers": [
-          "P.O Nº",
+          "P.O N°",
           "Name of Cormodity\nTên và miêu",
           "NO"
         ],
         "columns_with_full_grid": [
           "NO",
-          "P.O Nº",
+          "P.O N°",
           "Name of Cormodity\nTên và miêu",
           "Description\ntả hàng hóa",
-          "Quantity(SF)",
-          "Unit Price(USD)",
-          "Total value(USD)"
+          "Quantity\nSố lượng(SF)",
+          "Unit Price\nĐơn giá(USD)",
+          "Total value\nTrị giá(USD)"
         ],
         "default_font": {
           "name": "Times New Roman",
@@ -279,34 +279,34 @@
           "wrap_text": true
         },
         "column_styles": {
-          "Total value(USD)": {
+          "Total value\nTrị giá(USD)": {
             "font": {"bold": false},
             "alignment": {"horizontal": "center"},
             "number_format": "#,##0.00"
           },
-          "Unit Price(USD)": {
+          "Unit Price\nĐơn giá(USD)": {
             "alignment": {"horizontal": "center"},
             "number_format": "#,##0.000000"
           },
-          "Quantity(SF)": {
+          "Quantity\nSố lượng(SF)": {
             "alignment": {"horizontal": "center"},
             "number_format": "#,##0.00"
           },
-          "Description": {
+          "Description\ntả hàng hóa": {
             "alignment": {"horizontal": "left"}
           },
-          "P.O Nº": {
+          "P.O N°": {
             "alignment": {"horizontal": "center"}
           }
         },
         "column_widths": {
           "NO": 14,
-          "Name of Cormodity": 13,
-          "P.O N°": 13,
-          "Description": 17,
-          "Quantity(SF)": 19,
-          "Unit Price(USD)": 15,
-          "Total value(USD)": 21
+          "Name of Cormodity\nTên và miêu": 30,
+          "P.O N°": 27,
+          "Description\ntả hàng hóa": 17,
+          "Quantity\nSố lượng(SF)": 19,
+          "Unit Price\nĐơn giá(USD)": 15,
+          "Total value\nTrị giá(USD)": 21
         },
         "header_font": {
           "name": "Times New Roman",
@@ -325,7 +325,7 @@
       }
     },
     "Packing list": {
-      "start_row": 21,
+      "start_row": 19,
       "row_spacing": 1,
       "add_blank_after_header": false,
       "add_blank_before_footer": true,
@@ -344,7 +344,7 @@
         "Initial_Col1_Static_PL": {
           "type": "initial_static_rows",
           "column_header": "Mark & Nº",
-          "values": ["VENDOR#:", "Des: LEATHER","Case Qty:", "MADE IN CAMBODIA"]
+          "values": ["VENDOR#:", "Des: COW LEATHER","Case Qty:", "MADE IN CAMBODIA"]
         },
         "po": "P.O N°",
         "item": "ITEM N°",
