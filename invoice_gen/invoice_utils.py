@@ -1738,7 +1738,7 @@ def fill_invoice_data(
 
                                     # Check for Amount Column (to skip config formula later)
                                     amount_col_idx_override_check = None
-                                    amount_headers_override_check = ["Amount ( USD )", "Total value(USD)", "amount", "amount_sum"]
+                                    amount_headers_override_check = ["Amount ( USD )", "Total value(USD)", "amount", "amount_sum", "Amount(USD)"]
                                     for header, col_idx in column_map.items():
                                         if str(header).lower() in [h.lower() for h in amount_headers_override_check]:
                                             amount_col_idx_override_check = col_idx

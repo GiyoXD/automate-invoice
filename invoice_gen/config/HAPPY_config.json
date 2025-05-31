@@ -218,7 +218,7 @@
     },
     "Contract": {
       "total_footer_text": "TOTAL AMOUNT(Tổng trị giá):",
-      "start_row": 15,
+      "start_row": 19,
       "row_spacing": 0,
       "add_blank_after_header": false,
       "static_content_after_header": {},
@@ -344,7 +344,7 @@
         "Initial_Col1_Static_PL": {
           "type": "initial_static_rows",
           "column_header": "Mark & Nº",
-          "values": ["VENDOR#:", "Des: LEATHER", "MADE IN CAMBODIA"]
+          "values": ["VENDOR#:", "Des: LEATHER","Case Qty:", "MADE IN CAMBODIA"]
         },
         "po": "P.O N°",
         "item": "ITEM N°",
