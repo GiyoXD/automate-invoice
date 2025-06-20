@@ -92,144 +92,103 @@ def find_and_restore_merges_heuristic(workbook: openpyxl.Workbook,
     """
     Attempts to restore merges based on stored HORIZONTAL spans, values, and row heights
     by searching for the value within a specified range (default A16:H200).
-    Searches rows bottom-up within the range.
-    Includes detailed debugging output, prevents re-using a value, applies stored row height,
-    and explicitly sets the stored value in the top-left cell after merging.
+    This version is silent, with no detailed logging.
 
     WARNING: This is a HEURISTIC approach... (rest of docstring unchanged)
 
     Args: (args unchanged)
     """
-    print(f"\nAttempting heuristic merge restoration (searching range {search_range_str}, bottom-up)...")
+    print("Starting merge restoration process...")
+
+    # These counters are still used by the logic but are no longer printed.
     restored_count = 0
     failed_count = 0
     skipped_count = 0
     skipped_duplicate_value_count = 0
 
-    # --- Define search boundaries ---
+    # --- Define search boundaries (critical errors are still reported) ---
     try:
         search_min_col, search_min_row, search_max_col, search_max_row = range_boundaries(search_range_str)
-        print(f"  Search boundaries: Rows {search_min_row}-{search_max_row}, Cols {search_min_col}-{search_max_col} ({get_column_letter(search_min_col)}{search_min_row}:{get_column_letter(search_max_col)}{search_max_row})")
     except TypeError as te:
-         print(f"  Error processing search range '{search_range_str}'. Check openpyxl version compatibility or range format. Internal error: {te}")
-         traceback.print_exc()
-         return
-    except Exception as e:
-        print(f"  Error: Invalid search range string '{search_range_str}'. Cannot proceed with restoration. Error: {e}")
+        print(f"Error processing search range '{search_range_str}'. Check openpyxl version compatibility or range format. Internal error: {te}")
+        traceback.print_exc()
         return
-    # --- End boundary definition ---
-
+    except Exception as e:
+        print(f"Error: Invalid search range string '{search_range_str}'. Cannot proceed with restoration. Error: {e}")
+        return
 
     # --- Loop through sheets ---
     for sheet_name in processed_sheet_names:
         if sheet_name in workbook.sheetnames and sheet_name in stored_merges:
             worksheet: Worksheet = workbook[sheet_name]
             original_merges_data = stored_merges[sheet_name]
-            print(f"  Processing sheet '{sheet_name}' ({len(original_merges_data)} stored merges)...")
-
-            restored_start_cells = set()
             successfully_restored_values_on_sheet = set()
 
             # --- Loop through stored merge info ---
-            for col_span, stored_value, stored_height in original_merges_data: # Unpack height
+            for col_span, stored_value, stored_height in original_merges_data:
 
                 if col_span <= 1:
                     skipped_count += 1
                     continue
 
                 if stored_value in successfully_restored_values_on_sheet:
-                    # print(f"    Skipping search for Value: '{stored_value}' (Span: {col_span}) - Value already used on sheet '{sheet_name}'.")
                     skipped_duplicate_value_count += 1
                     continue
 
                 found = False
-                # print(f"    Searching for Value: '{stored_value}' (Type: {type(stored_value)}), Target Span: {col_span}, Stored Height: {stored_height}")
-
                 # --- Search range loop - ROW SEARCH REVERSED ---
                 for r in range(search_max_row, search_min_row - 1, -1):
                     for c in range(search_min_col, search_max_col + 1):
-                        cell_coord = (r, c)
-                        if cell_coord in restored_start_cells:
-                            continue
-
                         current_cell = worksheet.cell(row=r, column=c)
                         current_val = current_cell.value
 
-                        # print(f"      Checking Cell {get_column_letter(c)}{r}: Value='{current_val}' (Type: {type(current_val)}) | Seeking: '{stored_value}' (Type: {type(stored_value)})")
-
                         if current_val == stored_value:
-                            # print(f"        MATCH FOUND at {get_column_letter(c)}{r}!")
-                            # print(f"    Attempting to merge {col_span} columns starting at {get_column_letter(c)}{r} for value '{stored_value}'.") # Keep this higher-level message
                             start_row, start_col = r, c
                             end_row = start_row
                             end_col = start_col + col_span - 1
-                            target_range_str = f"{get_column_letter(start_col)}{start_row}:{get_column_letter(end_col)}{end_row}"
 
-                            # --- Unmerge existing ---
+                            # --- Proactively unmerge any conflicting ranges ---
                             merged_ranges_copy = list(worksheet.merged_cells.ranges)
-                            for merged_range in merged_ranges_copy:
-                                if merged_range.min_row <= start_row <= merged_range.max_row and \
-                                   merged_range.min_col <= start_col <= merged_range.max_col:
-                                     try:
-                                         # print(f"      Unmerging existing range {merged_range.coord} overlapping target {target_range_str}")
-                                         worksheet.unmerge_cells(str(merged_range))
-                                     except KeyError: pass
-                                     except Exception as ue: print(f"      Error unmerging existing range {merged_range.coord}: {ue}")
+                            for existing_merge in merged_ranges_copy:
+                                rows_overlap = (existing_merge.min_row <= end_row) and (existing_merge.max_row >= start_row)
+                                cols_overlap = (existing_merge.min_col <= end_col) and (existing_merge.max_col >= start_col)
+
+                                if rows_overlap and cols_overlap:
+                                    try:
+                                        worksheet.unmerge_cells(str(existing_merge))
+                                    except Exception:
+                                        # Fails silently as requested
+                                        pass
 
                             # --- Apply the new merge, Row Height, AND Value ---
                             try:
-                                # 1. Apply merge
                                 worksheet.merge_cells(start_row=start_row, start_column=start_col, end_row=end_row, end_column=end_col)
-                                print(f"      Successfully merged {target_range_str}")
 
-                                # 2. Apply stored row height
                                 if stored_height is not None:
                                     try:
                                         worksheet.row_dimensions[start_row].height = stored_height
-                                        print(f"      Applied row height {stored_height} to row {start_row}")
-                                    except Exception as height_err:
-                                        print(f"      Warning: Failed to apply row height {stored_height} to row {start_row}. Error: {height_err}")
-                                else:
-                                     print(f"      Stored height was None, row {start_row} keeps its current height.")
+                                    except Exception:
+                                        # Fails silently
+                                        pass
 
-                                # 3. Restore the value to the top-left cell
-                                try:
-                                    top_left_cell_to_set = worksheet.cell(row=start_row, column=start_col)
-                                    top_left_cell_to_set.value = stored_value
-                                    print(f"      Set value '{stored_value}' to top-left cell {get_column_letter(start_col)}{start_row}")
-                                except Exception as value_err:
-                                    print(f"      Warning: Failed to set value '{stored_value}' to cell {get_column_letter(start_col)}{start_row}. Error: {value_err}")
+                                top_left_cell_to_set = worksheet.cell(row=start_row, column=start_col)
+                                top_left_cell_to_set.value = stored_value
 
-                                # 4. Record success
-                                restored_start_cells.add(cell_coord)
                                 successfully_restored_values_on_sheet.add(stored_value)
                                 restored_count += 1
                                 found = True
-                                break # Stop search loops for THIS stored_value pair
+                                break
 
-                            except Exception as e:
-                                print(f"      Error merging cells, setting height, or setting value for {target_range_str}: {e}")
+                            except Exception:
                                 failed_count += 1
-                                found = True # Still found, just failed
-                                break # Stop search loops for THIS stored_value pair
+                                found = True
+                                break
 
                     if found:
-                        break # Stop searching columns if found in current row
+                        break
 
-                # --- Check if found after loops ---
                 if not found:
                     if stored_value not in successfully_restored_values_on_sheet:
-                        # print(f"    -> Value '{stored_value}' (span {col_span}) NOT FOUND in range {search_range_str} on sheet '{sheet_name}'.")
                         failed_count += 1
 
-        else:
-            print(f"  Skipping merge restoration for sheet '{sheet_name}' (not found in workbook or no stored merges).")
-
-    # --- Final Summary ---
-    print("\nFinished heuristic merge restoration.")
-    print(f"  Successfully restored: {restored_count}")
-    print(f"  Failed/Not Found:    {failed_count}")
-    print(f"  Skipped (span <= 1): {skipped_count}")
-    print(f"  Skipped (value reused):{skipped_duplicate_value_count}")
-
-# No __main__ block included as per previous request.
+    print("Merge restoration process finished.")

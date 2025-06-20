@@ -1,0 +1,267 @@
+{
+    "metadata": {
+        "workbook_filename": "HAPPY.xlsx",
+        "worksheet_name": "Sheet1",
+        "fob_compounding_input_mode": "standard",
+        "fob_chunk_size": 2,
+        "fob_intra_separator": "/",
+        "fob_inter_separator": "\\n",
+        "timestamp": "2025-06-20T10:56:21.366886"
+    },
+    "processed_tables_data": {
+        "1": {
+            "po": [
+                "KBCGDD167779",
+                "KBCGDD167779",
+                "2025.4.14",
+                "2025.4.14",
+                "2025.4.14",
+                "2025.4.14",
+                "2025.01.15",
+                "2025.01.15",
+                "2025.01.15",
+                "2025.01.15",
+                "2024.11.29"
+            ],
+            "reference_code": [
+                "XPAY-FT-\u68d5409",
+                "XPAY-FT-\u68d5409",
+                "XPAY-FT-\u68d5409",
+                "XPAY-FT-\u68d5409",
+                "XPAY-FT-\u68d5409",
+                "XPAY-FT-\u68d5409",
+                "XPDY-FT-\u7070\u767d233",
+                "XPDY-FT-\u7070\u767d233",
+                "XPDY-FT-\u7070\u767d233",
+                "XPDY-FT-\u7070\u767d233",
+                "XPDY-ET-\u767d154"
+            ],
+            "item": [
+                "NMP-029J",
+                "NMP-029J",
+                "NMP-029J",
+                "NMP-029J",
+                "NMP-029J",
+                "NMP-029J",
+                "RB0604",
+                "RB0604",
+                "RB0604",
+                "RB0604",
+                "RB08649"
+            ],
+            "pcs": [
+                219,
+                8,
+                195,
+                144,
+                115,
+                9,
+                190,
+                180,
+                4,
+                167,
+                225
+            ],
+            "sqft": [
+                12581.6,
+                412.3,
+                11172.6,
+                7959,
+                6485.5,
+                495.6,
+                10214.8,
+                10214.5,
+                203.6,
+                9048.5,
+                11143.6
+            ],
+            "pallet_count": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ],
+            "gross": [
+                "944.0154",
+                "34.4846",
+                "828",
+                "599.5",
+                "489.6774",
+                "38.3226",
+                "853",
+                "846.1957",
+                "18.8043",
+                "753",
+                "967.5"
+            ],
+            "net": [
+                "900.6013",
+                "32.8987",
+                "783",
+                "554.5",
+                "447.9435",
+                "35.0565",
+                "808",
+                "802.1739",
+                "17.8261",
+                "708",
+                "922.5"
+            ],
+            "manual_no": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ],
+            "remarks": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ],
+            "unit": [
+                1.16,
+                0.99,
+                1.16,
+                1.16,
+                1.16,
+                0.99,
+                1.3,
+                1.3,
+                1.11,
+                1.3,
+                1.3
+            ],
+            "amount": [
+                14594.655999999999,
+                408.177,
+                12960.216,
+                9232.439999999999,
+                7523.179999999999,
+                490.644,
+                13279.24,
+                13278.85,
+                225.996,
+                11763.050000000001,
+                14486.68
+            ],
+            "cbm": [
+                "2.7507",
+                "0.1005",
+                "2.6928",
+                "2.1780",
+                "1.7628",
+                "0.1380",
+                "2.5344",
+                "2.6343",
+                "0.0585",
+                "2.4552",
+                "2.9700"
+            ],
+            "inv_date": [
+                "17/06/2025",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ],
+            "inv_ref": [
+                "CLF2025-181",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ]
+        }
+    },
+    "standard_aggregation_results": {
+        "('KBCGDD167779', 'NMP-029J', Decimal('1.16'), None)": {
+            "sqft_sum": "12581.6",
+            "amount_sum": "14594.655999999999"
+        },
+        "('KBCGDD167779', 'NMP-029J', Decimal('0.99'), None)": {
+            "sqft_sum": "412.3",
+            "amount_sum": "408.177"
+        },
+        "('2025.4.14', 'NMP-029J', Decimal('1.16'), None)": {
+            "sqft_sum": "25617.1",
+            "amount_sum": "29715.835999999998"
+        },
+        "('2025.4.14', 'NMP-029J', Decimal('0.99'), None)": {
+            "sqft_sum": "495.6",
+            "amount_sum": "490.644"
+        },
+        "('2025.01.15', 'RB0604', Decimal('1.3'), None)": {
+            "sqft_sum": "29477.8",
+            "amount_sum": "38321.140000000001"
+        },
+        "('2025.01.15', 'RB0604', Decimal('1.11'), None)": {
+            "sqft_sum": "203.6",
+            "amount_sum": "225.996"
+        },
+        "('2024.11.29', 'RB08649', Decimal('1.3'), None)": {
+            "sqft_sum": "11143.6",
+            "amount_sum": "14486.68"
+        }
+    },
+    "custom_aggregation_results": {
+        "('KBCGDD167779', 'NMP-029J', None, None)": {
+            "sqft_sum": "12993.9",
+            "amount_sum": "15002.832999999999"
+        },
+        "('2025.4.14', 'NMP-029J', None, None)": {
+            "sqft_sum": "26112.7",
+            "amount_sum": "30206.479999999998"
+        },
+        "('2025.01.15', 'RB0604', None, None)": {
+            "sqft_sum": "29681.4",
+            "amount_sum": "38547.136000000001"
+        },
+        "('2024.11.29', 'RB08649', None, None)": {
+            "sqft_sum": "11143.6",
+            "amount_sum": "14486.68"
+        }
+    },
+    "final_fob_compounded_result": {
+        "1": {
+            "combined_po": "2024.11.29/2025.01.15\n2025.4.14/KBCGDD167779",
+            "combined_item": "NMP-029J/RB0604\nRB08649",
+            "combined_description": "",
+            "total_sqft": "79931.6",
+            "total_amount": "98243.128999999998"
+        }
+    }
+}

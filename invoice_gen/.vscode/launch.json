@@ -9,8 +9,9 @@
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/generate_invoice.py",
-            "args": ["data/KB.json", "-c", "config", "-t", "TEMPLATE", "--fob"],
-            "console": "integratedTerminal"
+            "args": ["data/CLW.json", "-c", "config", "-t", "TEMPLATE", "--fob"],
+            "console": "integratedTerminal",
+            "key": "ctrl+f9"
         }
     ]
 }
