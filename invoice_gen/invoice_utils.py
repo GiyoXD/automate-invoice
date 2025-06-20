@@ -1424,6 +1424,42 @@ def write_footer_row(
         return -1
 
 
+def _style_row_before_footer(
+    worksheet: Worksheet,
+    row_num: int,
+    num_columns: int,
+    sheet_styling_config: Optional[Dict[str, Any]],
+    idx_to_id_map: Dict[int, str],
+    col1_index: int, # Included to match call signature, not used in this logic
+    fob_mode: bool # Pass fob_mode down for correct number formatting
+):
+    """
+    Applies column-specific and default styles to the static row before the footer.
+    """
+    if not sheet_styling_config or row_num <= 0:
+        return
+
+    # Define a standard border for this row to separate it from data and footer
+    thin_side = Side(border_style="thin", color="000000")
+    full_thin_border = Border(left=thin_side, right=thin_side, top=thin_side, bottom=thin_side)
+
+    # Iterate through each column of the row
+    for c_idx in range(1, num_columns + 1):
+        try:
+            cell = worksheet.cell(row=row_num, column=c_idx)
+            current_col_id = idx_to_id_map.get(c_idx)
+
+            # 1. Use the existing helper to apply font, alignment, and number formats
+            #    based on the column ID and default configurations.
+            _apply_cell_style(cell, current_col_id, sheet_styling_config, fob_mode)
+
+            # 2. Apply a consistent border to every cell in this row.
+            cell.border = full_thin_border
+
+        except Exception as e:
+            print(f"Warning: Could not style cell at ({row_num}, {c_idx}). Error: {e}")
+
+
 
 def fill_invoice_data(
     worksheet: Worksheet,
@@ -1808,8 +1844,7 @@ def fill_invoice_data(
                     sheet_styling_config=sheet_styling_config,
                     idx_to_id_map=idx_to_id_map, # Pass the ID map here
                     col1_index=col1_index,
-                    fob_mode=fob_mode
-                )
+                    fob_mode=fob_mode)
             except Exception as fill_bf_err:
                 print(f"Warning: Error filling/styling row before footer: {fill_bf_err}")
         
