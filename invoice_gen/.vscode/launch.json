@@ -9,7 +9,7 @@
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/generate_invoice.py",
-            "args": ["HAPPY.json", "-c", "config", "-t", "TEMPLATE", "--fob"],
+            "args": ["data/OJY.json", "-c", "config", "-t", "TEMPLATE", "--fob"],
             "console": "integratedTerminal"
         }
     ]
