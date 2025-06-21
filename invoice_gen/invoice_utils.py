@@ -1454,16 +1454,32 @@ def _style_row_before_footer(
     fob_mode: bool # Pass fob_mode down for correct number formatting
 ):
     """
-    Applies column-specific and default styles to the static row before the footer.
+    Applies column-specific styles, a full border, and a specific height
+    to the static row before the footer.
     """
     if not sheet_styling_config or row_num <= 0:
         return
+
+    # --- START: Added Logic to Set Row Height ---
+    # Set the row height using the 'header' value from the styling config.
+    # This is done once for the entire row.
+    try:
+        # Safely retrieve the 'header' height from the nested config dictionary
+        row_heights = sheet_styling_config.get("row_heights", {})
+        header_height = row_heights.get("header")
+
+        if header_height:
+            worksheet.row_dimensions[row_num].height = header_height
+    except Exception as e:
+        # Add a warning if the height could not be set for any reason
+        print(f"Warning: Could not set row height for row {row_num}. Error: {e}")
+    # --- END: Added Logic ---
 
     # Define a standard border for this row to separate it from data and footer
     thin_side = Side(border_style="thin", color="000000")
     full_thin_border = Border(left=thin_side, right=thin_side, top=thin_side, bottom=thin_side)
 
-    # Iterate through each column of the row
+    # Iterate through each column of the row to apply cell-level styles
     for c_idx in range(1, num_columns + 1):
         try:
             cell = worksheet.cell(row=row_num, column=c_idx)
@@ -1478,7 +1494,6 @@ def _style_row_before_footer(
 
         except Exception as e:
             print(f"Warning: Could not style cell at ({row_num}, {c_idx}). Error: {e}")
-
 
 
 def fill_invoice_data(
