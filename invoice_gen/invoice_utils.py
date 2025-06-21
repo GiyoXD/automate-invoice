@@ -915,24 +915,16 @@ def _apply_fallback(
     fob_mode: bool
 ):
     """
-    Applies a fallback value with improved, more flexible logic.
-    - If in FOB mode, it PREFERS 'fallback_on_fob'.
-    - If 'fallback_on_fob' is not found, it uses 'fallback_on_none'.
+    Applies a fallback value to the row_dict based on the fob_mode.
     """
-    if target_col_idx in row_dict:
-        return
+    if fob_mode:
+        fallback_key = "fallback_on_fob"
+    else:
+        fallback_key = "fallback_on_none"
+        
+    if fallback_key in mapping_rule:
+        row_dict[target_col_idx] = mapping_rule[fallback_key]
 
-    fallback_fob = mapping_rule.get("fallback_on_fob")
-    fallback_none = mapping_rule.get("fallback_on_none")
-
-    # --- NEW, MORE FLEXIBLE LOGIC ---
-    # If in FOB mode AND a specific FOB fallback exists, use it.
-    if fob_mode and fallback_fob is not None:
-        row_dict[target_col_idx] = fallback_fob
-    # Otherwise (not in FOB mode, OR no specific FOB fallback was found),
-    # use the standard fallback if it exists.
-    elif fallback_none is not None:
-        row_dict[target_col_idx] = fallback_none
 
 def prepare_data_rows(
     data_source_type: str,
@@ -988,9 +980,8 @@ def prepare_data_rows(
                 row_dict[price_col_idx] = {"type": "formula", "template": "{col_ref_1}{row}/{col_ref_0}{row}", "inputs": ["col_qty_sf", "col_amount"]}
             data_rows_prepared.append(row_dict)
 
-    # --- Handler for Custom Aggregation (Unchanged) ---
+    # --- Handler for Custom Aggregation (FOB Check and Fallback Added) ---
     elif data_source_type == 'custom_aggregation':
-        # (This block remains the same as your working version)
         custom_data = data_source or {}
         num_data_rows_from_source = len(custom_data)
         price_col_idx = column_id_map.get("col_unit_price")
@@ -998,24 +989,39 @@ def prepare_data_rows(
 
         for key_tuple, value_dict in custom_data.items():
             if not isinstance(key_tuple, tuple) or len(key_tuple) < 4: continue
-            row_dict = {
-                column_id_map.get("col_po"): key_tuple[0],
-                column_id_map.get("col_item"): key_tuple[1],
-                column_id_map.get("col_qty_sf"): _to_numeric(value_dict.get("sqft_sum")),
-                column_id_map.get("col_amount"): _to_numeric(value_dict.get("amount_sum")),
-            }
+            
+            row_dict = {}
+            # Directly map known values first
+            row_dict[column_id_map.get("col_po")] = key_tuple[0]
+            row_dict[column_id_map.get("col_item")] = key_tuple[1]
+            row_dict[column_id_map.get("col_qty_sf")] = _to_numeric(value_dict.get("sqft_sum"))
+            row_dict[column_id_map.get("col_amount")] = _to_numeric(value_dict.get("amount_sum"))
+
             if desc_col_idx_local:
                 desc_value = key_tuple[3]
                 if desc_value:
                     row_dict[desc_col_idx_local] = desc_value
                     dynamic_desc_used = True
+            
+            # Apply fallbacks for any unmapped columns based on fob_mode
+            for header, mapping_rule in dynamic_mapping_rules.items():
+                target_id = mapping_rule.get("id")
+                target_col_idx = column_id_map.get(target_id)
+                if not target_col_idx or target_col_idx in row_dict:
+                    continue
+
+                # If the column is not already populated, apply the appropriate fallback.
+                # The _apply_fallback function should handle the logic for
+                # 'fallback_on_non' vs 'fallback_fob' based on the fob_mode flag.
+                _apply_fallback(row_dict, target_col_idx, mapping_rule, fob_mode)
+
             if price_col_idx:
                 row_dict[price_col_idx] = {"type": "formula", "template": "{col_ref_1}{row}/{col_ref_0}{row}", "inputs": ["col_qty_sf", "col_amount"]}
+            
             data_rows_prepared.append({k: v for k, v in row_dict.items() if k is not None})
 
     # --- Unified Handler for Aggregation & Processed Tables (TYPO FIXED) ---
     else:
-        # (This block remains the same as your working version, with the typo corrected)
         normalized_data = []
         if data_source_type == 'aggregation':
             aggregation_data = data_source or {}
@@ -1049,9 +1055,7 @@ def prepare_data_rows(
                         data_value = value_dict.get(mapping_rule['value_key'])
                 elif 'table_row_index' in item:
                     i, table_data = item['table_row_index'], item['table_data']
-                    # <<< START OF FIX (Typo corrected) >>>
                     source_list = table_data.get(header, [])
-                    # <<< END OF FIX >>>
                     if i < len(source_list):
                         data_value = source_list[i]
 
@@ -1083,6 +1087,22 @@ def prepare_data_rows(
         data_rows_prepared.extend([{}] * (num_static_labels - len(data_rows_prepared)))
     
     return data_rows_prepared, pallet_counts_for_rows, dynamic_desc_used, num_data_rows_from_source
+
+# Helper functions _to_numeric and _apply_fallback would be defined elsewhere in your code.
+# For example:
+def _to_numeric(value: Any) -> Any:
+    """Converts a value to a numeric type if possible."""
+    if isinstance(value, (int, float)):
+        return value
+    if isinstance(value, str):
+        try:
+            return int(value)
+        except (ValueError, TypeError):
+            try:
+                return float(value)
+            except (ValueError, TypeError):
+                pass
+    return value
 
 
 
