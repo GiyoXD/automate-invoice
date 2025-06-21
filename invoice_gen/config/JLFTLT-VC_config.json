@@ -50,7 +50,7 @@
       "footer_configurations": {
   "comment": "This is the TEMPLATE for the main total row and the Grand Total row.",
 
-  "total_text": "TOTAL:",
+  "total_text": "TOTAL OF:",
   "total_text_column_id": "col_po",
   "pallet_count_column_id": "col_item",
 
@@ -94,7 +94,7 @@
         "header_font": { "name": "Times New Roman", "size": 12, "bold": true },
         "default_alignment": { "horizontal": "center", "vertical": "center", "wrap_text": true },
         "header_alignment": { "horizontal": "center", "vertical": "center", "wrap_text": true },
-        "row_heights": { "header": 29, "data_default": 27, "footer": 27 }
+        "row_heights": { "header": 37, "data_default": 30, "footer": 30 }
       }
     },
     "Contract": {
@@ -124,7 +124,7 @@
       "footer_configurations": {
         "comment": "This is the TEMPLATE for the main total row and the Grand Total row.",
 
-        "total_text": "TOTAL:",
+        "total_text": "TOTAL OF:",
         "total_text_column_id": "col_no",
 
         "sum_column_ids": [
@@ -164,7 +164,7 @@
           "col_amount":     { "number_format": "#,##0.00" },
           "col_unit_price": { "number_format": "#,##0.00" },
           "col_qty_sf":     { "number_format": "#,##0.00" },
-          "col_desc":       { "alignment": {"horizontal": "left"} }
+          "col_desc":       { "alignment": {"horizontal": "center"} }
         },
         "column_id_widths": {
           "col_no": 14, "col_desc": 35, "col_qty_sf": 27, "col_unit_price": 28, "col_amount": 47
@@ -214,7 +214,7 @@
   "footer_configurations": {
   "comment": "This is the TEMPLATE for the main total row and the Grand Total row.",
 
-  "total_text": "TOTAL:",
+  "total_text": "TOTAL OF:",
   "total_text_column_id": "col_po",
   "pallet_count_column_id": "col_item",
 
